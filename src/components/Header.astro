@@ -1,0 +1,62 @@
+---
+import { Icon } from "astro-icon"
+---
+
+<header class="header">
+  <div class="header__container">
+    <a href="/" aria-label="Home Page" class="logo">
+      <span>AD</span>
+    </a>
+    <a
+      class="header__email"
+      href="mailto:hello@aaronduke.co.uk"
+      aria-label="Email Me"
+    >
+      <Icon name="mdi:email" />
+    </a>
+  </div>
+</header>
+
+<style lang="scss">
+  .header {
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1rem 2rem;
+    background-color: #011627;
+
+    &__container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    &__logo {
+      width: 3rem;
+      height: 3rem;
+    }
+    &__email {
+      color: #011627;
+      background-color: #fff;
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease-in-out;
+      border: 1px solid #011627;
+      &:hover {
+        color: #fff;
+        background-color: #011627;
+        border: 1px solid #fff;
+      }
+    }
+  }
+  [astro-icon] {
+    width: 2rem;
+    height: 2rem;
+  }
+</style>

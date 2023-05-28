@@ -1,0 +1,132 @@
+---
+const { project } = Astro.props
+
+const image = `url(${project.image})`
+---
+
+<article class="project hidden">
+  <div class="project__image"></div>
+  <div class="project__tags">
+    {project.tags.map((tag: string) => <span>{tag}</span>)}
+  </div>
+  <div class="project__info">
+    <h3>{project.title}</h3>
+    <p>{project.text}</p>
+  </div>
+  <div class="project__links">
+    <a
+      href={project.link}
+      target="_blank"
+      rel="noopener"
+      aria-label="View Website">View Website</a
+    >
+    {
+      project.github && (
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noopener"
+          aria-label="View Code"
+        >
+          View Code
+        </a>
+      )
+    }
+  </div>
+</article>
+
+<style lang="scss" define:vars={{ image }}>
+  .project {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    background-color: red;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-radius: 0.25rem;
+    overflow: hidden;
+
+    &__image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-image: var(--image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: all 0.2s ease-in-out;
+    }
+
+    &__tags {
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 0.5rem;
+      z-index: 1;
+    }
+
+    &__info {
+      z-index: 1;
+    }
+
+    &__links {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      z-index: 1;
+    }
+
+    span {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    h3 {
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    p {
+      margin-top: 1rem;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 400;
+      max-width: 400px;
+      line-height: 1.25;
+      letter-spacing: 1px;
+    }
+    a {
+      border-bottom: 1px solid #fff;
+      padding-bottom: 0.25rem;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        border-bottom: 1px solid transparent;
+      }
+    }
+  }
+
+  .project:nth-child(1) {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+
+  .project:nth-child(4) {
+    grid-column-start: 2;
+    grid-column-end: 4;
+  }
+
+  .project:hover,
+  .project:focus {
+    .project__image {
+      transform: scale(1.1);
+    }
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+const { strip } = Astro.props
+---
+
+<section class="strip" id="about">
+  <div class="strip__container">
+    <p class="hidden hidden__left">{strip.text}</p>
+    <a
+      class="btn btn--white hidden hidden__right"
+      href={strip.btnLink}
+      target="_blank"
+      rel="noopener"
+      aria-label={strip.btnText}>{strip.btnText}</a
+    >
+  </div>
+</section>
+
+<style lang="scss">
+  .strip {
+    background-color: #011627;
+    padding: 4rem 2rem;
+
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6rem;
+    }
+
+    p {
+      color: #fff;
+      max-width: 800px;
+      line-height: 1.5;
+      font-size: 1.25rem;
+    }
+  }
+</style>

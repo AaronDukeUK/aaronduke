@@ -1,0 +1,48 @@
+---
+import Project from "./Project.astro"
+
+// Data
+import { projects } from "../data/projects.js"
+---
+
+<section class="projects">
+  <div class="projects__container">
+    <div class="projects__header">
+      <h2 class="hidden hidden__left">PROJECTS</h2>
+      <a
+        class="btn hidden hidden__right"
+        href="https://github.com/AaronDukeUK"
+        target="_blank"
+        rel="noopener"
+        aria-label="Github">GITHUB</a
+      >
+    </div>
+    <div class="projects__list">
+      {projects.map((project) => <Project project={project} />)}
+    </div>
+  </div>
+</section>
+
+<style lang="scss">
+  .projects {
+    padding: 4rem 2rem;
+
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    &__list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 0.5rem;
+    }
+  }
+</style>
