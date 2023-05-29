@@ -28,6 +28,10 @@ import { projects } from "../data/projects.js"
     padding: 4rem 2rem;
     overflow: hidden;
 
+    @media (max-width: 700px) {
+      padding: 4rem 1rem;
+    }
+
     &__container {
       max-width: 1200px;
       margin: 0 auto;
@@ -47,7 +51,7 @@ import { projects } from "../data/projects.js"
       @media (max-width: 900px) {
         grid-template-columns: repeat(2, 1fr);
       }
-      @media (max-width: 675px) {
+      @media (max-width: 700px) {
         grid-template-columns: repeat(1, 1fr);
       }
     }

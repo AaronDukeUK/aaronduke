@@ -6,22 +6,17 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 1rem;
-}
-
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  width: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: #011627;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
 .hidden {
   opacity: 0;
   filter: blur(5px);
-  transition: all 1s;
+  transition: all 1.5s;
   &__left {
     transform: translateX(-100%);
   }
@@ -104,4 +99,7 @@ html {
   max-height: 100px;
   padding: 1rem 2rem;
   border-bottom: 1px solid #fff;
+  @media (max-width: 700px) {
+    padding: 1rem 1rem;
+  }
 }

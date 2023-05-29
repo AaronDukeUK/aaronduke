@@ -30,6 +30,9 @@ import { Icon } from "astro-icon"
     max-height: 0;
     transition: all 0.5s ease-in-out;
     padding: 0 2rem;
+    @media (max-width: 700px) {
+      padding: 0rem 1rem;
+    }
 
     &__container {
       display: flex;

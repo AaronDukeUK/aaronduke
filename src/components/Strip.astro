@@ -20,6 +20,9 @@ const { strip } = Astro.props
     background-color: #011627;
     padding: 4rem 2rem;
     overflow: hidden;
+    @media (max-width: 700px) {
+      padding: 4rem 1rem;
+    }
 
     &__container {
       max-width: 1200px;
@@ -33,12 +36,8 @@ const { strip } = Astro.props
         gap: 4rem;
       }
     }
-
     p {
-      color: #fff;
-      max-width: 800px;
-      line-height: 1.5;
-      font-size: 1.25rem;
+      max-width: 900px;
       @media (max-width: 900px) {
         text-align: center;
       }
