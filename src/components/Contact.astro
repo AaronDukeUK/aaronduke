@@ -1,6 +1,58 @@
 ---
 ---
 
+<script>
+  const checkbox = document.querySelector('[data-checkbox="inquiry"]')
+  const checkboxToggle = document.querySelector(
+    '[data-checkbox-toggle="inquiry"]'
+  )
+  const inquiryDetails = document.querySelector('[data-inquiry-details=""]')
+
+  const phoneInput = document.querySelector('[name="phone"]')
+  const projectTypeInput = document.querySelector('[name="project_type"]')
+
+  const budgetSlider = document.querySelector('[data-budget-slider=""]')
+  const budgetValue = document.querySelector('[data-budget-value=""]')
+
+  checkboxToggle.addEventListener("click", () => {
+    if (checkbox.classList.contains("checked")) {
+      checkbox.classList.remove("checked")
+      inquiryDetails.classList.remove("show")
+      phoneInput.tabIndex = -1
+      projectTypeInput.tabIndex = -1
+      budgetSlider.tabIndex = -1
+    } else {
+      checkbox.classList.add("checked")
+      inquiryDetails.classList.add("show")
+      phoneInput.tabIndex = 0
+      projectTypeInput.tabIndex = 0
+      budgetSlider.tabIndex = 0
+    }
+  })
+
+  checkboxToggle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      if (checkbox.classList.contains("checked")) {
+        checkbox.classList.remove("checked")
+        inquiryDetails.classList.remove("show")
+        phoneInput.tabIndex = -1
+        projectTypeInput.tabIndex = -1
+        budgetSlider.tabIndex = -1
+      } else {
+        checkbox.classList.add("checked")
+        inquiryDetails.classList.add("show")
+        phoneInput.tabIndex = 0
+        projectTypeInput.tabIndex = 0
+        budgetSlider.tabIndex = 0
+      }
+    }
+  })
+
+  budgetSlider.addEventListener("input", () => {
+    budgetValue.innerHTML = budgetSlider.value
+  })
+</script>
+
 <section class="contact" id="contact">
   <div class="contact__container">
     <div class="contact__header">
@@ -31,6 +83,61 @@
         class="hidden hidden__left"
       />
 
+      <!-- Checkbox -->
+      <div
+        class="form__inquiry hidden hidden__left"
+        data-checkbox-toggle="inquiry"
+        tabindex="0"
+      >
+        <span class="form__checkbox" data-checkbox="inquiry" data-checked="true"
+        ></span>
+        <span>Inquiry</span>
+      </div>
+
+      <!-- Dropdown -->
+      <div
+        class="form__inquiry-details hidden hidden__left"
+        data-inquiry-details=""
+      >
+        <div class="form__inquiry-wrapper">
+          <div class="form__budget">
+            <p>Budget</p>
+            <div>
+              <input
+                tabindex="-1"
+                aria-label="Budget Slider"
+                type="range"
+                name="budget_slider"
+                min="1"
+                max="20"
+                step="1"
+                value="10"
+                data-budget-slider=""
+              />
+
+              <p>£ <span data-budget-value="">10</span>K</p>
+            </div>
+          </div>
+
+          <input
+            tabindex="-1"
+            aria-label="Project Type"
+            type="text"
+            name="project_type"
+            placeholder="PROJECT TYPE (E.G. WEBSITE, MOBILE APP)"
+          />
+
+          <input
+            tabindex="-1"
+            aria-label="Phone Number"
+            type="tel"
+            name="phone"
+            autocomplete="tel"
+            placeholder="PHONE NUMBER"
+          />
+        </div>
+      </div>
+
       <textarea
         class="hidden hidden__left"
         aria-label="Message"
@@ -45,73 +152,177 @@
       >
     </form>
   </div>
+</section>
 
-  <style lang="scss">
-    .contact {
-      padding: 4rem 2rem;
+<style lang="scss">
+  .contact {
+    padding: 4rem 2rem;
 
-      &__container {
-        max-width: 1200px;
-        margin: 0 auto;
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 0.25rem;
+
+    input,
+    textarea {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      width: 100%;
+      color: #011627;
+      resize: none;
+      border: 1px solid #011627;
+      border-radius: 0.25rem;
+      transition: all 1s;
+      &:focus {
+        outline: none;
+        background-color: #011627;
+        color: #fff;
+        &::placeholder {
+          color: #fff;
+        }
       }
 
-      &__header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
+      &::placeholder {
+        color: #011627;
       }
     }
-    .form {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      border-radius: 0.25rem;
 
-      input,
-      textarea {
-        padding: 0.75rem 1rem;
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      flex-grow: 1;
+      height: 2px;
+      background: #d3d3d3;
+      padding: 0;
+      margin-bottom: 1rem;
+      &:focus {
+        background: #011627;
+      }
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #011627;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    }
+
+    &__inquiry {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid #011627;
+      border-radius: 0.25rem;
+      span {
         font-size: 0.85rem;
         letter-spacing: 1px;
-        margin-bottom: 0.5rem;
-        width: 100%;
         color: #011627;
-        resize: none;
-        border: 1px solid #011627;
-        border-radius: 0.25rem;
-        &:focus {
-          outline: none;
-          background-color: #011627;
-          color: #fff;
-          &::placeholder {
-            color: #fff;
-          }
-        }
-
-        &::placeholder {
-          color: #011627;
-        }
       }
-      &__submit {
-        display: inline-block;
-        text-transform: uppercase;
-        text-decoration: none;
-        font-size: 1.25rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        color: #fff;
-        background: #011627;
-        padding: 1rem 2rem;
-        border-radius: 0.25rem;
-        transition: all 0.3s ease-in-out;
-        border: 1px solid #011627;
-        cursor: pointer;
-        &:hover {
-          background: #fff;
-          color: #011627;
-          border: 1px solid #011627;
+    }
+
+    &__checkbox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      border: 1px solid #011627;
+      border-radius: 0.25rem;
+      &.checked {
+        &::after {
+          content: "";
+          display: block;
+          width: 0.5rem;
+          height: 0.5rem;
+          background-color: #011627;
+          border-radius: 0.25rem;
         }
       }
     }
-  </style>
-</section>
+
+    &__inquiry-details {
+      width: 100%;
+      max-height: 0px;
+      overflow: hidden;
+      transition: all 0.4s ease-in-out;
+      opacity: 0;
+
+      &.show {
+        max-height: 200px;
+        opacity: 1;
+      }
+    }
+
+    &__inquiry-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    &__budget {
+      width: 100%;
+      display: flex;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid #011627;
+      border-radius: 0.25rem;
+      div {
+        width: 100%;
+      }
+      p {
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        color: #011627;
+        text-transform: uppercase;
+        margin-right: 2rem;
+      }
+      span {
+        color: #011627;
+      }
+    }
+    &__submit {
+      display: inline-block;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+      background: #011627;
+      padding: 1rem 2rem;
+      border-radius: 0.25rem;
+      transition: all 0.3s ease-in-out;
+      border: 1px solid #011627;
+      cursor: pointer;
+      &:hover {
+        background: #fff;
+        color: #011627;
+        border: 1px solid #011627;
+      }
+    }
+  }
+</style>
