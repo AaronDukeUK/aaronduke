@@ -64,7 +64,12 @@
       >
     </div>
 
-    <form action="/thankyou" method="post" class="form" netlify>
+    <form
+      method="post"
+      class="form"
+      data-netlify="true"
+      data-netlify-recaptcha="true"
+    >
       <div class="form__container">
         <input
           aria-label="Name"
@@ -192,6 +197,7 @@
       color: #011627;
       resize: none;
       border: 1px solid #011627;
+      border-radius: 0.25rem;
       &:focus {
         outline: none;
         background-color: #011627;
@@ -236,6 +242,7 @@
 
     &__inquiry {
       border: 1px solid #011627;
+      border-radius: 0.25rem;
       padding: 0.75rem 1rem;
       display: flex;
       align-items: center;
@@ -295,6 +302,7 @@
       padding: 0.75rem 1rem;
       margin-bottom: 0.5rem;
       border: 1px solid #011627;
+      border-radius: 0.25rem;
       div {
         width: 100%;
       }
