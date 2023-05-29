@@ -1,6 +1,10 @@
 @import "./reset";
 @import "./typography";
 
+body {
+  overflow-x: hidden;
+}
+
 ::-webkit-scrollbar {
   width: 1rem;
 }
