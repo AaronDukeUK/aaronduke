@@ -47,6 +47,7 @@ html {
 }
 
 .btn {
+  width: 10rem;
   text-transform: uppercase;
   display: inline-block;
   font-size: 1.25rem;
@@ -59,6 +60,7 @@ html {
   letter-spacing: 2px;
   transition: all 0.3s ease-in-out;
   border: 1px solid #011627;
+  text-align: center;
 
   &:hover {
     background: #fff;

@@ -26,6 +26,7 @@ import { projects } from "../data/projects.js"
 <style lang="scss">
   .projects {
     padding: 4rem 2rem;
+    overflow: hidden;
 
     &__container {
       max-width: 1200px;
@@ -43,6 +44,12 @@ import { projects } from "../data/projects.js"
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-gap: 0.5rem;
+      @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      @media (max-width: 675px) {
+        grid-template-columns: repeat(1, 1fr);
+      }
     }
   }
 </style>
