@@ -1,11 +1,16 @@
 ---
-const { project } = Astro.props
+import { Image } from "@astrojs/image/components"
 
-const image = `url(${project.image})`
+const { project } = Astro.props
 ---
 
 <article class="project hidden">
-  <div class="project__image"></div>
+  <Image
+    loading="lazy"
+    class="project__image"
+    src={project.image}
+    alt={project.title}
+  />
   <div class="project__tags">
     {project.tags.map((tag: string) => <span>{tag}</span>)}
   </div>
@@ -35,7 +40,7 @@ const image = `url(${project.image})`
   </div>
 </article>
 
-<style lang="scss" define:vars={{ image }}>
+<style lang="scss">
   .project {
     position: relative;
     height: 400px;
@@ -55,10 +60,6 @@ const image = `url(${project.image})`
       left: 0;
       height: 100%;
       width: 100%;
-      background-image: var(--image);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
       transition: all 0.2s ease-in-out;
     }
 

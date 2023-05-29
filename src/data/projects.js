@@ -1,7 +1,7 @@
 import dwa from "../assets/images/dwa.svg"
-import clock from "../assets/images/clock.jpg"
-import audio from "../assets/images/audio.png"
-import ono from "../assets/images/ono.png"
+import clock from "../assets/images/clock.webp"
+import audio from "../assets/images/audio.webp"
+import ono from "../assets/images/ono.webp"
 
 export const projects = [
   {
