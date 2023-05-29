@@ -14,6 +14,7 @@ textarea,
 button {
   color: #011627;
   font-family: "Inconsolata", monospace;
+  line-height: 1.25;
 }
 
 html {
@@ -22,19 +23,22 @@ html {
 
 h1 {
   font-family: "Montserrat", sans-serif;
-  font-weight: 700;
   font-size: 5rem;
+  font-weight: 700;
   letter-spacing: 3px;
-  line-height: 5rem;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 h2 {
+  font-family: "Inconsolata", monospace;
   font-size: 2rem;
   font-weight: 700;
-  text-transform: uppercase;
-  line-height: 2rem;
-  font-family: "Inconsolata", monospace;
   letter-spacing: 1.5px;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 h3 {
@@ -42,7 +46,7 @@ h3 {
   font-weight: 700;
   font-size: 1.5rem;
   letter-spacing: 1px;
-  line-height: 1.5rem;
+  line-height: 1.25;
 }
 
 a {
@@ -50,6 +54,6 @@ a {
   color: #fff;
   font-size: 1rem;
   letter-spacing: 2px;
-  line-height: 1rem;
+  line-height: 1.25;
   font-weight: 700;
 }

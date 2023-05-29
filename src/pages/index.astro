@@ -31,6 +31,17 @@ import { strip, strip2 } from "../data/strips.js"
   hiddenElements.forEach((element) => {
     observer.observe(element)
   })
+
+  const header = document.querySelector(".header")
+  const toggleClass = "is-sticky"
+  window.addEventListener("scroll", () => {
+    const currentScroll = window.scrollY
+    if (currentScroll > 50) {
+      header.classList.add(toggleClass)
+    } else {
+      header.classList.remove(toggleClass)
+    }
+  })
 </script>
 
 <html lang="en">
@@ -39,9 +50,14 @@ import { strip, strip2 } from "../data/strips.js"
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta
+      name="description"
+      content="Aaron Duke Front-End Developer from Norfolk, UK."
+    />
     <title>Aaron Duke &#x2022 Front-End Developer</title>
   </head>
   <body>
+    <Header />
     <Hero />
 
     <Strip strip={strip} />
