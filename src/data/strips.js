@@ -5,7 +5,7 @@ export const strip = {
 }
 
 export const strip2 = {
-  text: "Front-End Developer with a background in Hospitality Management, bringing a unique perspective to the industry. Away from coding, I have a passion for cooking, walking the dogs and Euro games.",
+  text: "Front-End Developer with a background in hospitality management, bringing a unique perspective to the industry. Away from coding, I have a passion for cooking, walking the dogs and Euro games.",
   btnText: "LINKEDIN",
   btnLink: "https://www.linkedin.com/in/aduke-dev/",
 }
