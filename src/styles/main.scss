@@ -16,7 +16,7 @@ body {
 .hidden {
   opacity: 0;
   filter: blur(5px);
-  transition: all 1.5s;
+  transition: all 0.5s;
   &__left {
     transform: translateX(-100%);
   }
