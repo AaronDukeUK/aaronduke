@@ -1,7 +1,7 @@
 export const strip = {
   text: "I am passionate about personal development, always keeping up-to-date with the latest technologies. Now looking for new opportunities to work with forward-thinking companies and individuals.",
   btnText: "VIEW CV",
-  btnLink: "/ADCV.pdf",
+  btnLink: "/",
 }
 
 export const strip2 = {
