@@ -1,7 +1,11 @@
 ---
+import { site } from "../data/site"
 ---
 
 <script>
+  const form = document.querySelector('[data-contact-form=""]')
+  const formStatus = document.querySelector('[data-form-status=""]')
+  const submitButton = form?.querySelector('[type="submit"]')
   const checkbox = document.querySelector('[data-checkbox="inquiry"]')
   const checkboxToggle = document.querySelector(
     '[data-checkbox-toggle="inquiry"]'
@@ -14,98 +18,233 @@
   const budgetSlider = document.querySelector('[data-budget-slider=""]')
   const budgetValue = document.querySelector('[data-budget-value=""]')
 
-  checkboxToggle.addEventListener("click", () => {
-    if (checkbox.classList.contains("checked")) {
-      checkbox.classList.remove("checked")
-      inquiryDetails.classList.remove("show")
-      phoneInput.tabIndex = -1
-      projectTypeInput.tabIndex = -1
-      budgetSlider.tabIndex = -1
-    } else {
-      checkbox.classList.add("checked")
-      inquiryDetails.classList.add("show")
-      phoneInput.tabIndex = 0
-      projectTypeInput.tabIndex = 0
-      budgetSlider.tabIndex = 0
-    }
-  })
+  if (form && formStatus) {
+    const searchParams = new URLSearchParams(window.location.search)
+    const submitted = searchParams.get("submitted") === "contact"
 
-  checkboxToggle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      if (checkbox.classList.contains("checked")) {
-        checkbox.classList.remove("checked")
-        inquiryDetails.classList.remove("show")
-        phoneInput.tabIndex = -1
-        projectTypeInput.tabIndex = -1
-        budgetSlider.tabIndex = -1
-      } else {
-        checkbox.classList.add("checked")
-        inquiryDetails.classList.add("show")
-        phoneInput.tabIndex = 0
-        projectTypeInput.tabIndex = 0
-        budgetSlider.tabIndex = 0
+    if (submitted) {
+      formStatus.hidden = false
+      formStatus.dataset.state = "success"
+      formStatus.textContent =
+        "Thanks - your message has been sent. I will get back to you soon."
+    }
+
+    const fields = form.querySelectorAll(
+      'input:not([type="hidden"]):not([type="range"]), textarea'
+    )
+
+    fields.forEach((field) => {
+      field.addEventListener("invalid", () => {
+        field.setAttribute("aria-invalid", "true")
+      })
+
+      field.addEventListener("input", () => {
+        if (field.validity.valid) {
+          field.removeAttribute("aria-invalid")
+        }
+      })
+    })
+
+    const updateStatus = (state, message) => {
+      formStatus.hidden = false
+      formStatus.dataset.state = state
+      formStatus.textContent = message
+      formStatus.focus()
+    }
+
+    form.addEventListener("submit", async (event) => {
+      if (!form.checkValidity()) {
+        updateStatus(
+          "error",
+          "Please complete the required fields and fix any errors before sending."
+        )
+        return
       }
-    }
-  })
 
-  budgetSlider.addEventListener("input", () => {
-    budgetValue.innerHTML = budgetSlider.value
-  })
+      event.preventDefault()
+
+      if (submitButton) {
+        submitButton.disabled = true
+      }
+
+      updateStatus("pending", "Sending your message...")
+
+      try {
+        const response = await fetch("/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams(new FormData(form)).toString(),
+        })
+
+        if (!response.ok) {
+          throw new Error("Submission failed")
+        }
+
+        form.reset()
+        fields.forEach((field) => {
+          field.removeAttribute("aria-invalid")
+        })
+
+        if (
+          checkbox &&
+          checkboxToggle &&
+          inquiryDetails &&
+          phoneInput &&
+          projectTypeInput &&
+          budgetSlider &&
+          budgetValue
+        ) {
+          checkbox.classList.remove("checked")
+          checkboxToggle.setAttribute("aria-expanded", "false")
+          inquiryDetails.classList.remove("show")
+          inquiryDetails.hidden = true
+          phoneInput.tabIndex = -1
+          projectTypeInput.tabIndex = -1
+          budgetSlider.tabIndex = -1
+          budgetSlider.value = "10"
+          budgetValue.textContent = budgetSlider.value
+        }
+
+        updateStatus(
+          "success",
+          "Thanks - your message has been sent. I will get back to you soon."
+        )
+      } catch {
+        updateStatus(
+          "error",
+          "Something went wrong while sending your message. Please try again or email me directly."
+        )
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false
+        }
+      }
+    })
+  }
+
+  if (
+    checkbox &&
+    checkboxToggle &&
+    inquiryDetails &&
+    phoneInput &&
+    projectTypeInput &&
+    budgetSlider &&
+    budgetValue
+  ) {
+    const toggleInquiry = () => {
+      const isChecked = checkbox.classList.toggle("checked")
+      inquiryDetails.classList.toggle("show", isChecked)
+      checkboxToggle.setAttribute("aria-expanded", String(isChecked))
+      inquiryDetails.hidden = !isChecked
+      phoneInput.tabIndex = isChecked ? 0 : -1
+      projectTypeInput.tabIndex = isChecked ? 0 : -1
+      budgetSlider.tabIndex = isChecked ? 0 : -1
+    }
+
+    checkboxToggle.addEventListener("click", toggleInquiry)
+
+    checkboxToggle.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault()
+        toggleInquiry()
+      }
+    })
+
+    inquiryDetails.hidden = true
+    checkboxToggle.setAttribute("aria-expanded", "false")
+    budgetValue.textContent = budgetSlider.value
+
+    budgetSlider.addEventListener("input", () => {
+      budgetValue.textContent = budgetSlider.value
+    })
+  }
 </script>
 
 <section class="contact" id="contact">
   <div class="contact__container">
     <div class="contact__header">
-      <h2 class="hidden hidden__left">CONTACT</h2>
+      <h2 class="hidden hidden__left">{site.contact.heading}</h2>
       <a
         class="btn hidden hidden__right"
-        href="mailto:hello@aaronduke.co.uk"
-        aria-label="Email Me">EMAIL</a
+        href={`mailto:${site.email}`}
+        aria-label={site.contact.ctaLabel}>{site.contact.ctaLabel}</a
       >
     </div>
 
-    <form method="POST" class="form" data-netlify="true" name="Contact Form">
+    <form
+      action="/?submitted=contact#contact"
+      method="POST"
+      class="form"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      data-contact-form=""
+      name={site.contact.formName}
+    >
+      <input type="hidden" name="form-name" value={site.contact.formName} />
+      <p class="sr-only">
+        <label for="contact-bot-field">Do not fill in this field</label>
+        <input id="contact-bot-field" name="bot-field" />
+      </p>
+      <p
+        class="form__status"
+        data-form-status=""
+        aria-live="polite"
+        tabindex="-1"
+        hidden
+      ></p>
+      <label class="sr-only" for="contact-name">Name</label>
       <input
-        aria-label="Name"
+        id="contact-name"
         type="text"
         placeholder="NAME"
         autocomplete="name"
         name="name"
-        class="hidden hidden__left"
+        minlength="2"
+        maxlength="100"
+        required
       />
 
+      <label class="sr-only" for="contact-email">Email address</label>
       <input
-        aria-label="Email"
+        id="contact-email"
         type="email"
         placeholder="EMAIL ADDRESS"
         name="email"
         autocomplete="email"
-        class="hidden hidden__left"
+        maxlength="120"
+        required
       />
 
       <!-- Checkbox -->
-      <div
-        class="form__inquiry hidden hidden__left"
+      <button
+        type="button"
+        class="form__inquiry"
         data-checkbox-toggle="inquiry"
-        tabindex="0"
+        aria-controls="inquiry-details"
+        aria-expanded="false"
       >
         <span class="form__checkbox" data-checkbox="inquiry" data-checked="true"
         ></span>
         <span>Inquiry</span>
-      </div>
+      </button>
 
       <!-- Dropdown -->
       <div
-        class="form__inquiry-details hidden hidden__left"
+        class="form__inquiry-details"
+        id="inquiry-details"
         data-inquiry-details=""
+        hidden
       >
         <div class="form__inquiry-wrapper">
           <div class="form__budget">
+            <label class="sr-only" for="budget-slider">Budget</label>
             <p>Budget</p>
             <div>
               <input
+                id="budget-slider"
                 tabindex="-1"
-                aria-label="Budget Slider"
                 type="range"
                 name="budget_slider"
                 min="1"
@@ -119,17 +258,19 @@
             </div>
           </div>
 
+          <label class="sr-only" for="project-type">Project type</label>
           <input
+            id="project-type"
             tabindex="-1"
-            aria-label="Project Type"
             type="text"
             name="project_type"
             placeholder="PROJECT TYPE (E.G. WEBSITE, MOBILE APP)"
           />
 
+          <label class="sr-only" for="phone-number">Phone number</label>
           <input
+            id="phone-number"
             tabindex="-1"
-            aria-label="Phone Number"
             type="tel"
             name="phone"
             autocomplete="tel"
@@ -138,17 +279,20 @@
         </div>
       </div>
 
+      <label class="sr-only" for="contact-message">Message</label>
       <textarea
-        class="hidden hidden__left"
-        aria-label="Message"
+        id="contact-message"
         name="message"
         placeholder="MESSAGE"
-        rows="6"></textarea>
+        rows="6"
+        minlength="10"
+        maxlength="2000"
+        required></textarea>
 
       <button
         aria-label="Submit Form"
         type="submit"
-        class="form__submit hidden hidden__right">Send</button
+        class="form__submit">Send</button
       >
     </form>
   </div>
@@ -172,6 +316,12 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 2rem;
+      @media (max-width: 700px) {
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        text-align: center;
+      }
     }
   }
   .form {
@@ -179,6 +329,59 @@
     flex-direction: column;
     align-items: flex-start;
     border-radius: 0.25rem;
+    @media (max-width: 700px) {
+      align-items: center;
+      text-align: center;
+    }
+
+    &__status {
+      width: 100%;
+      margin-bottom: 0.75rem;
+      padding: 0.85rem 1rem;
+      border-radius: 0.25rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #011627;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(1, 22, 39, 0.14);
+    }
+
+    &__status[data-state="success"] {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      background: #f4fbf7;
+      border-color: #1d6b43;
+      color: #154b30;
+    }
+
+    &__status[data-state="success"]::before {
+      content: "✓";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      margin-top: 0.05rem;
+      border-radius: 999px;
+      background: #1d6b43;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    &__status[data-state="error"] {
+      background: #fff;
+      border-color: #8b1e3f;
+      color: #5f1028;
+    }
+
+    &__status[data-state="pending"] {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: rgba(1, 22, 39, 0.22);
+    }
 
     input,
     textarea {
@@ -191,7 +394,10 @@
       resize: none;
       border: 1px solid #011627;
       border-radius: 0.25rem;
-      transition: all 1s;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
       &:focus {
         outline: none;
         background-color: #011627;
@@ -203,6 +409,10 @@
 
       &::placeholder {
         color: #011627;
+      }
+
+      &[aria-invalid="true"] {
+        border-color: #8b1e3f;
       }
     }
 
@@ -234,10 +444,13 @@
       padding: 0.75rem 1rem;
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 0.5rem;
       margin-bottom: 0.5rem;
+      background-color: #fff;
       border: 1px solid #011627;
       border-radius: 0.25rem;
+      cursor: pointer;
       span {
         text-transform: uppercase;
         font-size: 0.85rem;
@@ -272,11 +485,13 @@
       width: 100%;
       max-height: 0px;
       overflow: hidden;
-      transition: all 0.4s ease-in-out;
+      transition:
+        max-height 0.4s ease-in-out,
+        opacity 0.4s ease-in-out;
       opacity: 0;
 
       &.show {
-        max-height: 200px;
+        max-height: 28rem;
         opacity: 1;
       }
     }
@@ -293,8 +508,15 @@
       display: flex;
       padding: 0.75rem 1rem;
       margin-bottom: 0.5rem;
+      background-color: #fff;
       border: 1px solid #011627;
       border-radius: 0.25rem;
+      @media (max-width: 700px) {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 0.75rem;
+      }
       div {
         width: 100%;
       }
@@ -304,6 +526,9 @@
         color: #011627;
         text-transform: uppercase;
         margin-right: 2rem;
+        @media (max-width: 700px) {
+          margin-right: 0;
+        }
       }
       span {
         color: #011627;
@@ -324,10 +549,17 @@
       transition: all 0.3s ease-in-out;
       border: 1px solid #011627;
       cursor: pointer;
+      &:disabled {
+        cursor: wait;
+        opacity: 0.8;
+      }
       &:hover {
         background: #fff;
         color: #011627;
         border: 1px solid #011627;
+      }
+      @media (max-width: 700px) {
+        align-self: center;
       }
     }
   }

@@ -2,30 +2,39 @@
 import Project from "./Project.astro"
 
 // Data
-import { projects } from "../data/projects.js"
+import { projects } from "../data/projects"
+import { site } from "../data/site"
+
+const shouldSpanFull = (index: number) => index === projects.length - 1 && projects.length % 2 === 1
 ---
 
-<section class="projects">
+<section class="projects" id="projects">
   <div class="projects__container">
     <div class="projects__header">
-      <h2 class="hidden hidden__left">PROJECTS</h2>
+      <div class="projects__copy">
+        <p class="projects__eyebrow hidden hidden__left">{site.projectSection.eyebrow}</p>
+        <h2 class="hidden hidden__left">{site.projectSection.heading}</h2>
+        <p class="projects__summary hidden hidden__left">{site.projectSection.summary}</p>
+      </div>
       <a
-        class="btn hidden hidden__right"
-        href="https://github.com/AaronDukeUK"
+        class="btn btn--secondary hidden hidden__right"
+        href={site.projectSection.githubUrl}
         target="_blank"
         rel="noopener"
-        aria-label="Github">GITHUB</a
+        aria-label={site.projectSection.githubLabel}>{site.projectSection.githubLabel}</a
       >
     </div>
     <div class="projects__list">
-      {projects.map((project) => <Project project={project} />)}
+      {projects.map((project, index) => (
+        <Project project={project} spanFull={shouldSpanFull(index)} />
+      ))}
     </div>
   </div>
 </section>
 
 <style lang="scss">
   .projects {
-    padding: 4rem 2rem;
+    padding: 5rem 2rem;
     overflow: hidden;
 
     @media (max-width: 700px) {
@@ -38,16 +47,53 @@ import { projects } from "../data/projects.js"
     }
 
     &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+        align-items: center;
+        justify-items: center;
+        text-align: center;
+      }
+    }
+
+    &__copy {
+      max-width: 42rem;
+      @media (max-width: 700px) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+
+    &__eyebrow {
+      color: rgba(1, 22, 39, 0.58);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    &__summary {
+      margin-top: 1rem;
+      color: rgba(1, 22, 39, 0.72);
+      font-size: 1.05rem;
+      max-width: 38rem;
+      @media (max-width: 700px) {
+        text-align: center;
+      }
     }
 
     &__list {
       display: grid;
+      align-items: stretch;
       grid-template-columns: repeat(3, 1fr);
-      grid-gap: 0.5rem;
+      grid-gap: 1rem;
       @media (max-width: 900px) {
         grid-template-columns: repeat(2, 1fr);
       }

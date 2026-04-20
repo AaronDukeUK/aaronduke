@@ -1,16 +1,20 @@
 ---
-const { strip } = Astro.props
+import type { ContentStrip } from "../data/site"
+
+const { strip } = Astro.props as { strip: ContentStrip }
+
+const isExternal = strip.cta.external ?? strip.cta.href.startsWith("http")
 ---
 
-<section class="strip" id="about">
+<section class="strip" id={strip.id}>
   <div class="strip__container">
     <p class="hidden hidden__left">{strip.text}</p>
     <a
       class="btn btn--white hidden hidden__right"
-      href={strip.btnLink}
-      target="_blank"
-      rel="noopener"
-      aria-label={strip.btnText}>{strip.btnText}</a
+      href={strip.cta.href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      aria-label={strip.cta.label}>{strip.cta.label}</a
     >
   </div>
 </section>

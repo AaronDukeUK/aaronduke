@@ -1,46 +1,136 @@
 ---
-import { skills } from "../data/hero.js"
+import { site } from "../data/site"
+
+const [availabilityPrimary, ...availabilitySecondaryParts] =
+  site.hero.eyebrow.split(" and ")
+const availabilitySecondary = availabilitySecondaryParts.join(" and ")
 ---
 
 <section class="hero">
   <div class="hero__container">
     <div class="hero__left hidden hidden__left">
-      <h1>AARON DUKE</h1>
-      <h2>FRONT-END DEVELOPER &#x2022 NORFOLK &#x2022 UK</h2>
+      <p class="hero__eyebrow">
+        <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+        <span class="hero__eyebrow-primary">{availabilityPrimary}</span>
+        {
+          availabilitySecondary && (
+            <span class="hero__eyebrow-secondary">
+              and {availabilitySecondary}
+            </span>
+          )
+        }
+      </p>
+      <h1>{site.name}</h1>
+      <div class="hero__meta">
+        <span>{site.role}</span>
+        <span>{site.location}</span>
+      </div>
+      <p class="hero__summary">{site.hero.summary}</p>
       <div class="hero__btns">
-        <a class="btn" href="#about" aria-label="About Section">ABOUT</a>
-        <a class="btn" href="#contact" aria-label="Email Me"> CONTACT</a>
+        {
+          site.hero.actions.map((action) => (
+            <a
+              class={`btn ${action.variant === "secondary" ? "btn--secondary" : ""}`}
+              href={action.href}
+              target={action.external ? "_blank" : undefined}
+              rel={action.external ? "noopener noreferrer" : undefined}
+              aria-label={action.label}
+            >
+              {action.label}
+            </a>
+          ))
+        }
       </div>
     </div>
-    <div class="hero__right">
-      {skills.map((skill) => <span class="hidden hidden__right">{skill}</span>)}
+    <div class="hero__right hidden hidden__right">
+      <p class="hero__panel-label">{site.hero.skillsLabel}</p>
+      <p class="hero__panel-copy">{site.hero.skillsIntro}</p>
+      <div class="hero__skills">
+        {site.skills.map((skill) => <span>{skill}</span>)}
+      </div>
     </div>
   </div>
 
   <style lang="scss">
     .hero {
       min-height: 100vh;
-      padding: 4rem 2rem;
+      padding: 7rem 2rem 5rem;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(23, 50, 77, 0.14) 0%,
+          rgba(23, 50, 77, 0) 38%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(1, 22, 39, 0.12) 0%,
+          rgba(1, 22, 39, 0) 42%
+        ),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 246, 250, 0.98));
       @media (max-width: 700px) {
-        padding: 4rem 1rem;
+        padding: 6rem 1rem 4rem;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(
+            125deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(23, 50, 77, 0.06) 48%,
+            rgba(255, 255, 255, 0) 100%
+          ),
+          repeating-linear-gradient(
+            0deg,
+            rgba(23, 50, 77, 0.07) 0,
+            rgba(23, 50, 77, 0.07) 1px,
+            transparent 1px,
+            transparent 40px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(23, 50, 77, 0.06) 0,
+            rgba(23, 50, 77, 0.06) 1px,
+            transparent 1px,
+            transparent 40px
+          );
+        background-size: auto, auto, auto;
+        opacity: 0.68;
+        pointer-events: none;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.16) 0%,
+          rgba(255, 255, 255, 0) 22%,
+          rgba(1, 22, 39, 0.05) 100%
+        );
+        pointer-events: none;
       }
 
       &__container {
         width: 100%;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
         align-items: center;
-        gap: 2rem;
+        gap: 3rem;
         max-width: 1200px;
         margin: 0 auto;
+        position: relative;
+        z-index: 1;
         @media (max-width: 900px) {
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          grid-template-columns: 1fr;
           gap: 4rem;
         }
       }
@@ -54,52 +144,167 @@ import { skills } from "../data/hero.js"
         @media (max-width: 900px) {
           align-items: center;
           justify-content: center;
+          text-align: center;
+        }
+
+        h1 {
+          max-width: 8ch;
+          margin: 0;
+          font-size: clamp(4.5rem, 12vw, 8.5rem);
+          line-height: 0.92;
+          letter-spacing: -0.04em;
+          text-transform: uppercase;
+        }
+      }
+
+      &__eyebrow {
+        width: fit-content;
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: none;
+        color: rgba(1, 22, 39, 0.88);
+        border: 1px solid rgba(1, 22, 39, 0.18);
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(12px);
+        border-radius: 999px;
+        box-shadow: 0 0.8rem 1.8rem rgba(1, 22, 39, 0.08);
+        @media (max-width: 700px) {
+          width: 100%;
+          max-width: 24rem;
+          justify-content: center;
+          gap: 0.35rem;
+          padding: 0.9rem 1rem;
+          border-radius: 1rem;
+          text-align: center;
+        }
+      }
+
+      &__eyebrow-dot {
+        width: 0.65rem;
+        height: 0.65rem;
+        border-radius: 999px;
+        background: #17324d;
+        box-shadow: 0 0 0 0.3rem rgba(23, 50, 77, 0.14);
+        @media (max-width: 700px) {
+          display: none;
+        }
+      }
+
+      &__eyebrow-primary {
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        @media (max-width: 700px) {
+          width: 100%;
+        }
+      }
+
+      &__eyebrow-secondary {
+        color: rgba(1, 22, 39, 0.68);
+        letter-spacing: 0.04em;
+        @media (max-width: 700px) {
+          width: 100%;
+        }
+      }
+
+      &__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+
+        span {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.4rem 0.75rem;
+          border-radius: 999px;
+          border: 1px solid rgba(1, 22, 39, 0.14);
+          background: rgba(255, 255, 255, 0.72);
+          color: rgba(1, 22, 39, 0.88);
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        @media (max-width: 900px) {
+          justify-content: center;
+        }
+      }
+
+      &__summary {
+        max-width: 36rem;
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
+        line-height: 1.7;
+        color: rgba(1, 22, 39, 0.8);
+        @media (max-width: 900px) {
+          text-align: center;
         }
       }
 
       &__right {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 1rem;
-        border-left: 0.25rem solid rgba(1, 22, 39, 0.8);
-        padding: 2rem 0 2rem 4rem;
+        padding: 1.75rem;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(1, 22, 39, 0.12);
+        background: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 1.5rem 4rem rgba(1, 22, 39, 0.1);
+        backdrop-filter: blur(16px);
         @media (max-width: 900px) {
-          border-left: none;
-          border-top: 0.25rem solid rgba(1, 22, 39, 0.8);
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          flex-wrap: wrap;
-          padding: 4rem 0 0 0;
-        }
-
-        span {
-          font-size: 1.5rem;
-          line-height: 1.5rem;
-          letter-spacing: 2px;
-          color: rgba(1, 22, 39, 1);
-          &:hover {
-            opacity: 0;
-            filter: blur(5px);
-            transition: all 1s;
-          }
-
-          @media (max-width: 700px) {
-            font-size: 1.25rem;
-            letter-spacing: 1px;
-          }
+          width: 100%;
+          text-align: center;
         }
       }
 
       &__btns {
         display: flex;
-        gap: 1rem;
+        flex-wrap: wrap;
+        gap: 0.85rem;
         margin-top: 2rem;
         @media (max-width: 900px) {
           align-items: center;
           justify-content: center;
+        }
+      }
+
+      &__panel-label {
+        color: rgba(1, 22, 39, 0.6);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      &__panel-copy {
+        margin-top: 0.75rem;
+        color: rgba(1, 22, 39, 0.78);
+        font-size: 1rem;
+      }
+
+      &__skills {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        @media (max-width: 900px) {
+          justify-content: center;
+        }
+
+        span {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.65rem 0.85rem;
+          border-radius: 999px;
+          background: rgba(1, 22, 39, 0.06);
+          border: 1px solid rgba(1, 22, 39, 0.08);
+          color: rgba(1, 22, 39, 0.92);
+          font-size: 0.95rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
         }
       }
     }

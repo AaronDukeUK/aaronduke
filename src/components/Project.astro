@@ -1,68 +1,192 @@
 ---
-import { Image } from "@astrojs/image/components"
+import { Image } from "astro:assets"
+import type { Project } from "../data/projects"
 
-const { project } = Astro.props
+const { project, spanFull = false } = Astro.props as {
+  project: Project
+  spanFull?: boolean
+}
+
+const imageSizes = spanFull
+  ? "(max-width: 700px) 100vw, (max-width: 900px) 100vw, 92vw"
+  : "(max-width: 700px) 100vw, (max-width: 900px) 50vw, 50vw"
+
+const isVectorImage = project.image?.format === "svg"
 ---
 
-<article class="project hidden">
-  <Image
-    loading="lazy"
-    class="project__image"
-    src={project.image}
-    alt={project.title}
-  />
+<article
+  class={`project hidden ${project.featured ? "project--featured" : ""} ${spanFull ? "project--span-full" : ""}`}
+  style={`--project-accent: ${project.accent};`}
+>
+  {
+    project.image ? (
+      <div class="project__media">
+        <Image
+          loading="lazy"
+          decoding="async"
+          class="project__image"
+          src={project.image}
+          alt={project.imageAlt ?? project.title}
+          widths={isVectorImage ? undefined : [480, 768, 960, 1280, 1600]}
+          sizes={isVectorImage ? undefined : imageSizes}
+          quality={isVectorImage ? undefined : 80}
+        />
+      </div>
+    ) : (
+      <div class="project__image project__image--fallback" aria-hidden="true">
+        <span>{project.title}</span>
+      </div>
+    )
+  }
+  <div class="project__meta">
+    {(project.badge || project.featured) && (
+      <span class="project__badge">{project.badge ?? "Featured"}</span>
+    )}
+    <span class="project__category">{project.category}</span>
+  </div>
   <div class="project__tags">
-    {project.tags.map((tag: string) => <span>{tag}</span>)}
+    {project.tags.map((tag) => <span>{tag}</span>)}
   </div>
   <div class="project__info">
     <h3>{project.title}</h3>
-    <p>{project.text}</p>
+    <p>{project.summary}</p>
   </div>
-  <div class="project__links">
-    <a
-      href={project.link}
-      target="_blank"
-      rel="noopener"
-      aria-label="View Website">View Website</a
-    >
-    {
-      project.github && (
-        <a
-          href={project.github}
-          target="_blank"
-          rel="noopener"
-          aria-label="View Code"
-        >
-          View Code
-        </a>
-      )
-    }
-  </div>
+  {
+    project.links.length > 0 && (
+      <div class="project__links">
+        {
+          project.links.map((link) => (
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${link.label}: ${project.title} (opens in a new tab)`}
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </div>
+    )
+  }
 </article>
 
 <style lang="scss">
   .project {
     position: relative;
-    height: 400px;
+    min-height: 420px;
     width: 100%;
-    background-color: red;
+    background: var(--project-accent);
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
+    gap: 1rem;
     border-radius: 0.25rem;
     overflow: hidden;
+    isolation: isolate;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 1.2rem 2.5rem rgba(1, 22, 39, 0.14);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        45deg,
+        rgba(1, 22, 39, 0.96) 0%,
+        rgba(1, 22, 39, 0.9) 35%,
+        rgba(1, 22, 39, 0.72) 50%,
+        rgba(1, 22, 39, 0.38) 72%,
+        rgba(1, 22, 39, 0.14) 100%
+      );
+      z-index: -1;
+    }
+
+    &__media {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+        linear-gradient(135deg, rgba(1, 22, 39, 0.38), rgba(1, 22, 39, 0.18));
+    }
+
+    &__media::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.06) 0%,
+          rgba(255, 255, 255, 0.015) 45%,
+          rgba(255, 255, 255, 0.09) 100%
+        );
+    }
 
     &__image {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
       height: 100%;
       width: 100%;
-      transition: all 0.2s ease-in-out;
+      transition:
+        transform 0.2s ease-in-out,
+        opacity 0.2s ease-in-out,
+        filter 0.2s ease-in-out;
       object-fit: cover;
       object-position: center;
+      filter: brightness(0.68) saturate(0.9);
+      z-index: 1;
+    }
+
+    &__image--fallback {
+      display: flex;
+      align-items: flex-end;
+      padding: 2rem;
+
+      span {
+        font-size: 2rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.18);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      z-index: 1;
+    }
+
+    &__badge,
+    &__category {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    &__badge {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.28);
     }
 
     &__tags {
@@ -70,50 +194,80 @@ const { project } = Astro.props
       justify-content: flex-start;
       width: 100%;
       gap: 0.5rem;
+      flex-wrap: wrap;
       z-index: 1;
     }
 
     &__info {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      gap: 1rem;
       z-index: 1;
     }
 
     &__links {
       display: flex;
-      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
       width: 100%;
       z-index: 1;
     }
 
-    span {
+    &__tags span {
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 0.72rem;
       font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
     }
 
     h3 {
       color: #fff;
-      font-size: 2rem;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
       font-weight: 700;
+      max-width: 12ch;
     }
 
     p {
-      margin-top: 1rem;
       color: #fff;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 400;
-      max-width: 400px;
-      line-height: 1.25;
-      letter-spacing: 1px;
+      max-width: 30rem;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
     }
     a {
-      border-bottom: 1px solid #fff;
-      padding-bottom: 0.25rem;
-      transition: all 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      transition:
+        transform 0.2s ease-in-out,
+        background 0.2s ease-in-out,
+        border-color 0.2s ease-in-out;
 
       &:hover {
-        border-bottom: 1px solid transparent;
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.16);
+        border-color: rgba(255, 255, 255, 0.28);
       }
     }
+  }
+
+  .project--featured {
+    box-shadow: 0 1.6rem 3rem rgba(1, 22, 39, 0.18);
   }
 
   @media (min-width: 900px) {
@@ -126,12 +280,48 @@ const { project } = Astro.props
       grid-column-start: 2;
       grid-column-end: 4;
     }
+
+    .project--span-full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 701px) and (max-width: 900px) {
+    .project--span-full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .project {
+      align-items: center;
+      text-align: center;
+    }
+
+    .project__meta,
+    .project__tags,
+    .project__links {
+      justify-content: center;
+    }
+
+    .project__info {
+      align-items: center;
+    }
+
+    .project h3,
+    .project p {
+      max-width: none;
+    }
   }
 
   .project:hover,
   .project:focus {
+    transform: translateY(-6px);
+    box-shadow: 0 1.8rem 3.4rem rgba(1, 22, 39, 0.18);
+    border-color: rgba(255, 255, 255, 0.2);
+
     .project__image {
-      transform: scale(1.1);
+      transform: scale(1.06);
     }
   }
 </style>
