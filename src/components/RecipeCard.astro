@@ -1,0 +1,145 @@
+---
+import type { CollectionEntry } from "astro:content"
+
+const { recipe } = Astro.props as { recipe: CollectionEntry<"recipes"> }
+const { title, description, category, serves, prepTime, cookTime, favourite } =
+  recipe.data
+
+const meta = [
+  serves && (serves.startsWith("Makes") ? serves : `Serves ${serves}`),
+  prepTime && `Prep ${prepTime}`,
+  cookTime && `Cook ${cookTime}`,
+].filter(Boolean)
+---
+
+<a
+  class="recipe-card hidden"
+  href={`/recipes/${recipe.id}/`}
+  data-category={category}
+>
+  <div class="recipe-card__meta">
+    {favourite && <span class="recipe-card__badge">House favourite</span>}
+    <span class="recipe-card__category">{category}</span>
+  </div>
+  <div class="recipe-card__info">
+    <h3>{title}</h3>
+    <p>{description}</p>
+  </div>
+  {
+    meta.length > 0 && (
+      <div class="recipe-card__footer">
+        {meta.map((item) => (
+          <span>{item}</span>
+        ))}
+      </div>
+    )
+  }
+</a>
+
+<style lang="scss">
+  .recipe-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    min-height: 16rem;
+    padding: 2rem;
+    border-radius: 0.25rem;
+    background: var(--color-surface-strong);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(12px);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-6px);
+      box-shadow: 0 1.8rem 3.4rem rgba(1, 22, 39, 0.16);
+      border-color: rgba(1, 22, 39, 0.2);
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    &__badge,
+    &__category {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    &__category {
+      color: var(--color-ink);
+      background: rgba(1, 22, 39, 0.06);
+      border: 1px solid var(--color-border);
+    }
+
+    &__badge {
+      color: #fff;
+      background: linear-gradient(135deg, #011627 0%, #17324d 100%);
+      border: 1px solid rgba(1, 22, 39, 0.18);
+    }
+
+    &__info {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      h3 {
+        color: var(--color-ink);
+      }
+
+      p {
+        color: var(--color-ink-soft);
+        font-size: 1rem;
+        letter-spacing: 0.01em;
+      }
+    }
+
+    &__footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.25rem;
+      padding-top: 1rem;
+      width: 100%;
+      border-top: 1px solid var(--color-border);
+
+      span {
+        color: rgba(1, 22, 39, 0.58);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  @media (max-width: 700px) {
+    .recipe-card {
+      align-items: center;
+      text-align: center;
+
+      &__meta,
+      &__footer {
+        justify-content: center;
+      }
+
+      &__info {
+        align-items: center;
+      }
+    }
+  }
+</style>

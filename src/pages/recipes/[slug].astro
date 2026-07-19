@@ -1,0 +1,435 @@
+---
+import { getCollection, render } from "astro:content"
+import { Icon } from "astro-icon/components"
+
+import Base from "../../layouts/Base.astro"
+import { site } from "../../data/site"
+
+export async function getStaticPaths() {
+  const recipes = await getCollection("recipes")
+  return recipes.map((recipe) => ({
+    params: { slug: recipe.id },
+    props: { recipe },
+  }))
+}
+
+const { recipe } = Astro.props
+const { Content } = await render(recipe)
+const { title, description, category, serves, prepTime, cookTime, tags, favourite, source } =
+  recipe.data
+const sourceHost = source ? new URL(source).hostname.replace(/^www\./, "") : null
+
+const meta = [
+  serves && {
+    icon: "mdi:account-multiple-outline",
+    label: serves.startsWith("Makes") ? serves : `Serves ${serves}`,
+  },
+  prepTime && { icon: "mdi:timer-outline", label: `Prep ${prepTime}` },
+  cookTime && { icon: "mdi:stove", label: `Cook ${cookTime}` },
+].filter(Boolean) as { icon: string; label: string }[]
+---
+
+<script>
+  document
+    .querySelectorAll<HTMLInputElement>(".recipe__ingredients input[type='checkbox']")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        checkbox.closest("li")?.classList.toggle("is-checked", checkbox.checked)
+      })
+    })
+</script>
+
+<Base title={`${title} • ${site.name}`} description={description} noindex>
+  <article class="recipe">
+    <div class="recipe__container">
+      <header class="recipe__header hidden">
+        <a class="recipe__back" href="/recipes/">
+          <Icon name="mdi:arrow-left" aria-hidden="true" />
+          All recipes
+        </a>
+        <div class="recipe__badges">
+          {favourite && <span class="recipe__badge">House favourite</span>}
+          <span class="recipe__category">{category}</span>
+        </div>
+        <h1 class="recipe__title">{title}</h1>
+        <p class="recipe__summary">{description}</p>
+        {
+          meta.length > 0 && (
+            <div class="recipe__meta">
+              {meta.map((item) => (
+                <span>
+                  <Icon name={item.icon} aria-hidden="true" />
+                  {item.label}
+                </span>
+              ))}
+            </div>
+          )
+        }
+        {
+          tags.length > 0 && (
+            <div class="recipe__tags">
+              {tags.map((tag) => (
+                <span>{tag}</span>
+              ))}
+            </div>
+          )
+        }
+      </header>
+
+      <div class="recipe__layout">
+        <aside class="recipe__ingredients hidden hidden__left">
+          <h2>Ingredients</h2>
+          <ul>
+            {
+              recipe.data.ingredients.map((ingredient) => (
+                <li>
+                  <label>
+                    <input type="checkbox" />
+                    <span>{ingredient}</span>
+                  </label>
+                </li>
+              ))
+            }
+          </ul>
+        </aside>
+
+        <section class="recipe__method hidden hidden__right">
+          <h2>Method</h2>
+          <Content />
+          {
+            source && (
+              <p class="recipe__source">
+                Adapted from{" "}
+                <a href={source} target="_blank" rel="noopener noreferrer">
+                  {sourceHost}
+                </a>
+              </p>
+            )
+          }
+        </section>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style lang="scss">
+  .recipe {
+    min-height: 100vh;
+    padding: 10rem 2rem 5rem;
+    overflow: hidden;
+
+    @media (max-width: 700px) {
+      padding: 8rem 1rem 4rem;
+    }
+
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    &__header {
+      max-width: 46rem;
+      margin-bottom: 3rem;
+    }
+
+    &__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 1.75rem;
+      color: rgba(1, 22, 39, 0.58);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--color-ink);
+      }
+
+      [data-icon] {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &__badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    &__badge,
+    &__category {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    &__category {
+      color: var(--color-ink);
+      background: rgba(1, 22, 39, 0.06);
+      border: 1px solid var(--color-border);
+    }
+
+    &__badge {
+      color: #fff;
+      background: linear-gradient(135deg, #011627 0%, #17324d 100%);
+      border: 1px solid rgba(1, 22, 39, 0.18);
+    }
+
+    &__title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+    }
+
+    &__summary {
+      margin-top: 1.25rem;
+      color: var(--color-ink-soft);
+      font-size: 1.1rem;
+      max-width: 40rem;
+    }
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+
+      span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        background: var(--color-surface-strong);
+        border: 1px solid var(--color-border);
+        color: var(--color-ink);
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        backdrop-filter: blur(12px);
+      }
+
+      [data-icon] {
+        width: 1.1rem;
+        height: 1.1rem;
+      }
+    }
+
+    &__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+
+      span {
+        padding: 0.45rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(1, 22, 39, 0.06);
+        border: 1px solid var(--color-border);
+        color: rgba(1, 22, 39, 0.72);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+    }
+
+    &__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+
+      @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    &__ingredients,
+    &__method {
+      padding: 2rem;
+      border-radius: 0.25rem;
+      background: var(--color-surface-strong);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(12px);
+
+      h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+      }
+    }
+
+    &__ingredients {
+      position: sticky;
+      top: calc(var(--anchor-offset) + 3.5rem);
+
+      @media (max-width: 900px) {
+        position: static;
+      }
+
+      ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+      }
+
+      li {
+        border-bottom: 1px solid var(--color-border);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &.is-checked span {
+          color: rgba(1, 22, 39, 0.38);
+          text-decoration: line-through;
+        }
+      }
+
+      label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.7rem 0;
+        cursor: pointer;
+      }
+
+      input[type="checkbox"] {
+        appearance: none;
+        flex-shrink: 0;
+        width: 1.15rem;
+        height: 1.15rem;
+        margin-top: 0.15rem;
+        border-radius: 0.3rem;
+        border: 2px solid rgba(1, 22, 39, 0.35);
+        background: #fff;
+        cursor: pointer;
+        display: grid;
+        place-content: center;
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease;
+
+        &::before {
+          content: "";
+          width: 0.6rem;
+          height: 0.6rem;
+          transform: scale(0);
+          transition: transform 0.15s ease;
+          clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+          background: #fff;
+        }
+
+        &:checked {
+          background: linear-gradient(135deg, #011627 0%, #17324d 100%);
+          border-color: #011627;
+
+          &::before {
+            transform: scale(1);
+          }
+        }
+      }
+
+      span {
+        color: var(--color-ink);
+        font-size: 0.98rem;
+        line-height: 1.5;
+        transition: color 0.15s ease;
+      }
+    }
+
+    &__method {
+      :global(ol) {
+        list-style: none;
+        counter-reset: step;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      :global(ol > li) {
+        counter-increment: step;
+        position: relative;
+        padding-left: 3.25rem;
+        color: var(--color-ink-soft);
+        font-family: "Inter", sans-serif;
+        font-size: 1.02rem;
+        line-height: 1.65;
+      }
+
+      :global(ol > li::before) {
+        content: counter(step);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2.25rem;
+        height: 2.25rem;
+        display: grid;
+        place-content: center;
+        border-radius: 50%;
+        color: #fff;
+        background: linear-gradient(135deg, #011627 0%, #17324d 100%);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      :global(li strong),
+      :global(p strong) {
+        color: var(--color-ink);
+        font-weight: 700;
+      }
+
+      :global(p) {
+        color: var(--color-ink-soft);
+        font-size: 1.02rem;
+      }
+
+      .recipe__source {
+        margin-top: 1.5rem;
+        color: rgba(1, 22, 39, 0.5);
+        font-size: 0.85rem;
+
+        a {
+          color: rgba(1, 22, 39, 0.7);
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          text-decoration: underline;
+          transition: color 0.2s ease;
+
+          &:hover {
+            color: var(--color-ink);
+          }
+        }
+      }
+
+      :global(blockquote) {
+        margin-top: 2rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.25rem;
+        border-left: 4px solid #011627;
+        background: rgba(1, 22, 39, 0.05);
+
+        :global(p) {
+          color: var(--color-ink);
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+</style>

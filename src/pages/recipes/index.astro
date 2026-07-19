@@ -1,0 +1,175 @@
+---
+import { getCollection } from "astro:content"
+
+import Base from "../../layouts/Base.astro"
+import RecipeCard from "../../components/RecipeCard.astro"
+import { site } from "../../data/site"
+
+const recipes = (await getCollection("recipes")).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+)
+const categories = [...new Set(recipes.map((recipe) => recipe.data.category))].sort()
+---
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>(".recipes__filters button")
+  const cards = document.querySelectorAll<HTMLAnchorElement>(".recipe-card")
+
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const filter = chip.dataset.filter
+      chips.forEach((other) => {
+        const isActive = other === chip
+        other.classList.toggle("is-active", isActive)
+        other.setAttribute("aria-pressed", String(isActive))
+      })
+      cards.forEach((card) => {
+        const show = filter === "all" || card.dataset.category === filter
+        card.style.display = show ? "" : "none"
+      })
+    })
+  })
+</script>
+
+<Base title={site.recipes.title} description={site.recipes.description} noindex>
+  <section class="recipes" id="recipes">
+    <div class="recipes__container">
+      <header class="recipes__header">
+        <p class="recipes__eyebrow hidden hidden__left">{site.recipes.eyebrow}</p>
+        <h1 class="recipes__title hidden hidden__left">{site.recipes.heading}</h1>
+        <p class="recipes__summary hidden hidden__left">{site.recipes.summary}</p>
+      </header>
+
+      {
+        categories.length > 1 && (
+          <div
+            class="recipes__filters hidden"
+            role="group"
+            aria-label="Filter recipes by category"
+          >
+            <button class="is-active" data-filter="all" aria-pressed="true">
+              All
+            </button>
+            {categories.map((category) => (
+              <button data-filter={category} aria-pressed="false">
+                {category}
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      <div class="recipes__list">
+        {recipes.map((recipe) => <RecipeCard recipe={recipe} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style lang="scss">
+  .recipes {
+    min-height: 100vh;
+    padding: 10rem 2rem 5rem;
+    overflow: hidden;
+
+    @media (max-width: 700px) {
+      padding: 8rem 1rem 4rem;
+    }
+
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    &__header {
+      max-width: 42rem;
+      margin-bottom: 2.5rem;
+
+      @media (max-width: 700px) {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    &__eyebrow {
+      color: rgba(1, 22, 39, 0.58);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    &__title {
+      font-size: clamp(3rem, 6vw, 4.5rem);
+    }
+
+    &__summary {
+      margin-top: 1rem;
+      color: var(--color-ink-soft);
+      font-size: 1.05rem;
+      max-width: 38rem;
+
+      @media (max-width: 700px) {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    &__filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+
+      @media (max-width: 700px) {
+        justify-content: center;
+      }
+
+      button {
+        cursor: pointer;
+        padding: 0.55rem 1rem;
+        border-radius: 999px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        color: var(--color-ink);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        backdrop-filter: blur(12px);
+        transition:
+          background 0.2s ease,
+          color 0.2s ease,
+          border-color 0.2s ease;
+
+        &:hover {
+          background: var(--color-surface-strong);
+          border-color: rgba(1, 22, 39, 0.2);
+        }
+
+        &.is-active {
+          color: #fff;
+          background: linear-gradient(135deg, #011627 0%, #17324d 100%);
+          border-color: rgba(1, 22, 39, 0.18);
+        }
+      }
+    }
+
+    &__list {
+      display: grid;
+      align-items: stretch;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 1rem;
+
+      @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (max-width: 700px) {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+  }
+</style>

@@ -81,6 +81,15 @@ export const site = {
     githubLabel: "GitHub",
     githubUrl: "https://github.com/AaronDukeUK",
   },
+  recipes: {
+    eyebrow: "From our kitchen",
+    heading: "House Recipes",
+    summary:
+      "The dishes we actually cook at home, written down properly so we stop digging through old chat threads for them. Pick a card for the full ingredients and method.",
+    title: "Recipes • Aaron Duke",
+    description:
+      "Our personal collection of home recipes — the dishes we cook again and again.",
+  },
   contact: {
     heading: "Let's Work Together",
     ctaLabel: "Email Me",
